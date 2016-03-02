@@ -1,17 +1,24 @@
-var express = require('express'), 
-    path = require('path'), 
-    levelup = require( 'levelup' ), 
-    _ = require('underscore'), 
+var express = require( 'express' ), 
+    path = require( 'path' ), 
+    appDB = require( 'nedb' ), 
+    _ = require( 'underscore' ), 
     moment = require( 'moment' ),
-    request = require('request'), 
+    request = require( 'request' ), 
     app = express(); 
 
-var indexOf = [].indexOf || function( item ) { 
-    for ( var i = 0, l = this.length; i < l; i++ ) { 
-        if ( i in this && this[ i ] === item ) 
-            return i; 
-    } return -1; 
-};
+var groupsDB = levelup( './appDB' ), 
+    indexOf = [].indexOf || function( item ) { 
+        for ( var i = 0, l = this.length; i < l; i++ ) { 
+            if ( i in this && this[ i ] === item ) 
+                return i; 
+        } return -1; 
+    };
+
+groupsDB.readStream()
+    .on( 'data', console.log )
+    .on('close', function () { console.log( '========================= FINISHED =========================' ) })
+
+
 
 
 function APIRequest() {
@@ -108,7 +115,7 @@ APIRequest.prototype = {
             }
 
             var numPostsFetched = posts.data.length;
-            
+
             // now we have a list of groups
             // find save mah inbox group
             // save it's id so we can create an actual req to SMI posts
@@ -176,5 +183,5 @@ function getGroups( accessToken ) {
 
 
 
-a = new APIRequest(); 
-a.getGroups(); 
+//a = new APIRequest(); 
+//a.getGroups(); 

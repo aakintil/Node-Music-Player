@@ -1,0 +1,25 @@
+{
+  "name": "node_music_player",
+  "version": "1.0.0",
+  "description": "testing an integrated cross music-platform player",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aakintil/Node-Music-Player.git"
+  },
+  "author": "Aderinsola Akintilo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aakintil/Node-Music-Player/issues"
+  },
+  "homepage": "https://github.com/aakintil/Node-Music-Player#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  },
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}

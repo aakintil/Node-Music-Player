@@ -24,7 +24,7 @@ function APIRequest() {
     this.new_until = null; 
     this.getGroupURL = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken; 
 }
-//CAACEdEose0cBAKiTPsMpjHZCDvZAade8PoqHkd8NSpR5LV0eojv1jpNQE9shg0c9y9wzmnuSx3QOLZAFCpjZAGfiJpNXqYJk4Hb2bMZAcxz7zhKJ9utejepjWZB1I66VPeldw67VFmpp4iRZAMQgwXhtEBp4VmooDtKSZBw0KedAIJMnKSFGq2mw54lH0wV1iNXpXSjwqVkTjwZDZD
+// https://graph.facebook.com/oauth/access_token?client_id=766241740105535&client_secret=9a58c535db3b7e9c8bd26b2179d91a85&grant_type=fb_exchange_token&fb_exchange_token=CAACEdEose0cBAH7zWnDqWlRSkc3xcI9aUjLSobttOA1o3662qhEEYn5X1zaUuH2UDTOZBhHUMlbEh2WfRRh8p3NiiLH554CilHnnvxbkcNJlalqOZB3tI0rZAv8ZBWhl9FdrLdLUfy2FMZB6ULQv8pth2sYstMXsR0MNgFv8B7AwaO0Tk5U7YiubPHAm9nObkS0qOqwHPYgZDZD
 
 APIRequest.prototype = {
 

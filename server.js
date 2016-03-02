@@ -8,13 +8,25 @@
 //}).listen( 8080, 'localhost' );
 //console.log( 'Server running at http://localhost:8080/' );
 
-var express = require('express');
-var app = express();
-var path = require('path');
+var express = require('express'), 
+    path = require('path'), 
+    levelup = require( 'levelup' ), 
+    _ = require('underscore'), 
+    app = express(); 
 
 // viewed at http://localhost:8080
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
+app.get( '/', function( req, res ) {
+    res.sendFile( path.join( __dirname + '/index.html' ) );
 });
 
+// listening / showing index
 app.listen(8080);
+
+function MusicPosts() {
+    
+}
+function getGroups() {
+
+    url = "https://graph.facebook.com/me/groups?access_token=" + program.accessToken;
+}
+

@@ -18,7 +18,7 @@ function APIRequest() {
     this.res_data = []; 
     this.downloadSince = null;
     this.group_id = ""; 
-    this.accessToken = 'CAACEdEose0cBAMm7Y1a7cOi2y4u6hkzFcZCG3QaAvEsI4GINgSczzc0So1Gr7GQnY5fcsPEQySf3ZBqD7Pm9V677xIXEsSLoUrT8UMZCwYZBzOzHsQ3ft57WdGuXLLbKnbmVnYqUA59ytP9hoOSE7MxGaoeeLmc0MCZC1q8MGLvNViPkS7jqURnJhMRcHMPSjb2StbgW1gQZDZD'; 
+    this.accessToken = 'CAACEdEose0cBABBAvGs6SsS5ZArAETOzsn6Lw8ZAW2k1KFhDPgJWGHPX78QZBfGjf4lcvRmzp3ApQfoblZASaGJaiyhhHONZCMcwqVG2cKspdg7hOkmZC9YH8re0kPZBWiMn0E8UDFIFiYiLRzRtA28edZClVqZCGovbLzRYPFqtXKn0BlKFzWR36V1yZAZAHkY2S5WVPjLKwCkJAZDZD'; 
     this.posts = [];
 }
 
@@ -77,7 +77,7 @@ APIRequest.prototype = {
     getPostsForGroup: function() {
         console.log( "3. passing group id \n", this.group_id, "\n" ); 
 
-        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=1000&access_token=" + this.accessToken + "& fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(999)";
+        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=1000&since=2013-07-02&access_token=" + this.accessToken + "& fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(1000)";
         group_id = this.group_id, 
             self = this; 
 
@@ -87,7 +87,7 @@ APIRequest.prototype = {
         // we'll have to create a database or figure out a way to use the UNTIL & SINCE clauses in the get request
         var new_url = this.timeParamUrl( null, null, url ); 
         
-        return request( new_url, function( error, response, body ) {
+        return request( url, function( error, response, body ) {
 
             // grab the body response
             posts = JSON.parse( body );

@@ -40,20 +40,28 @@ APIRequest.prototype = {
     // get the facebook group posts
     getGroups: function( accessToken ) {
         var url = "https://graph.facebook.com/me/groups?access_token=" + accessToken;
-        return request( url, function(error, response, body) {
+        return request( url, function( error, response, body ) {
 
-            posts = JSON.parse( body );
-            console.log( posts ); 
+            groups = JSON.parse( body );
+            console.log( groups ); 
 
             if ( error ) {
                 console.log( "error ", error );
                 process.exit(); 
-            } else if ( indexOf.call( posts, "error" ) >= 0 ) {
-                console.log( "posts error ", posts.error );
+            } else if ( indexOf.call( groups, "error" ) >= 0 ) {
+                console.log( "posts error ", groups.error );
                 process.exit(); 
             }
+
+            // find save mah inbox
+            // for ( var i in groups )
+            // if groups[ i ].name === 'Save Mah Inbox' 
+            // return with id; 
+            // name: 'Save Mah Inbox'
         })
     }
+
+
 }
 
 function getGroups( accessToken ) {

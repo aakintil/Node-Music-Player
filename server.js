@@ -12,6 +12,7 @@ var express = require('express'),
     path = require('path'), 
     levelup = require( 'levelup' ), 
     _ = require('underscore'), 
+    request = require('request'), 
     app = express(); 
 
 // viewed at http://localhost:8080
@@ -27,10 +28,27 @@ function APIRequest() {
 }
 
 APIRequest.prototype = {
+    
+    // get the facebook group posts
     getGroups: function( accessToken ) {
         var url = "https://graph.facebook.com/me/groups?access_token=" + accessToken;
+        return request( url, function(error, response, body) {
+            
+            posts = JSON.parse( body );
+            console.log( posts ); 
+            
+            if ( error ) {
+                console.log( "error ", error );
+                process.exit(); 
+            } else if ( indexOf.call( posts, "error" ) >= 0 ) {
+                console.log( "posts error ", posts.error );
+                process.exit(); 
+            }
+            
+        })
     }
 }
+
 
 function getGroups( accessToken ) {
     var url = "https://graph.facebook.com/me/groups?access_token=" + accessToken;

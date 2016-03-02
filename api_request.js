@@ -2,6 +2,7 @@ var express = require('express'),
     path = require('path'), 
     levelup = require( 'levelup' ), 
     _ = require('underscore'), 
+    moment = require( 'moment' ),
     request = require('request'), 
     app = express(); 
 
@@ -15,8 +16,10 @@ var indexOf = [].indexOf || function( item ) {
 
 function APIRequest() {
     this.res_data = []; 
+    this.downloadSince = null;
     this.group_id = ""; 
-    this.accessToken = 'CAACEdEose0cBABqO3wdcqkwCoffSHjQ9YgMVZBgbckZBRZAI3FoLUcc6W1mji8cX2fuGTo8l4BwkeHnwad6PVVPYGSc4S6TZBIC3ZCUcYXXjZAuTN5jxEs30ZB6KB97ZBUktp7ZBJwhTQW4q21akqbx8E9HuuQaLaKxHzSEzPuQNxkx2b1IPkXdrs9fcPU6IeP71rOxdvVlZBo2gZDZD'; 
+    this.accessToken = 'CAACEdEose0cBAMm7Y1a7cOi2y4u6hkzFcZCG3QaAvEsI4GINgSczzc0So1Gr7GQnY5fcsPEQySf3ZBqD7Pm9V677xIXEsSLoUrT8UMZCwYZBzOzHsQ3ft57WdGuXLLbKnbmVnYqUA59ytP9hoOSE7MxGaoeeLmc0MCZC1q8MGLvNViPkS7jqURnJhMRcHMPSjb2StbgW1gQZDZD'; 
+    this.posts = [];
 }
 
 APIRequest.prototype = {
@@ -74,13 +77,17 @@ APIRequest.prototype = {
     getPostsForGroup: function() {
         console.log( "3. passing group id \n", this.group_id, "\n" ); 
 
-        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=100&access_token=" + this.accessToken + "& fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(999)";
+        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=1000&access_token=" + this.accessToken + "& fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(999)";
         group_id = this.group_id, 
             self = this; 
 
         console.log( "4. requesting permission from facebook to get secret group posts" ); 
-        /*
-        return request( url, function( error, response, body ) {
+
+        // TODO 
+        // we'll have to create a database or figure out a way to use the UNTIL & SINCE clauses in the get request
+        var new_url = this.timeParamUrl( null, null, url ); 
+        
+        return request( new_url, function( error, response, body ) {
 
             // grab the body response
             posts = JSON.parse( body );
@@ -94,8 +101,36 @@ APIRequest.prototype = {
                 process.exit(); 
             }
 
+            console.log( "\n", posts.data.length, " posts " ); 
+
         })
-  */  
+        
+    }, 
+    
+    timeParamUrl: function( since, untilTime, url ) {
+        if ( since == null) {
+            since = null;
+        }
+        if ( untilTime == null ) {
+            untilTime = null;
+        }
+        
+        if ( untilTime == null ) {
+            url += "&until=" + ( moment().unix() );
+            untilTime = moment().unix();
+        } else {
+            url += "&until=" + untilTime;
+        }
+        if ( since != null ) {
+            url += "&since=" + since;
+        } else {
+            if ( this.downloadSince != null ) {
+                url += "&since=" + this.downloadSince;
+            } else {
+                url += "&since=0";
+            }
+        }
+        return url;
     }
 }
 
@@ -108,6 +143,8 @@ function boundedWrapper( object, method ) {
 function getGroups( accessToken ) {
     var url = "https://graph.facebook.com/me/groups?access_token=" + accessToken;
 }
+
+
 
 
 a = new APIRequest(); 

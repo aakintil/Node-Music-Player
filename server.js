@@ -20,13 +20,21 @@ app.get( '/', function( req, res ) {
 });
 
 // listening / showing index
-app.listen(8080);
+app.listen( 8080 );
 
-function MusicPosts() {
-    
-}
-function getGroups() {
-
-    url = "https://graph.facebook.com/me/groups?access_token=" + program.accessToken;
+function APIRequest() {
+    this.res_data = []; 
 }
 
+APIRequest.prototype = {
+    getGroups: function( accessToken ) {
+        var url = "https://graph.facebook.com/me/groups?access_token=" + accessToken;
+    }
+}
+
+function getGroups( accessToken ) {
+    var url = "https://graph.facebook.com/me/groups?access_token=" + accessToken;
+}
+
+console.log( "...working" ); 
+console.log( new APIRequest() ); 

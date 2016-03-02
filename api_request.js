@@ -18,9 +18,13 @@ function APIRequest() {
     this.res_data = []; 
     this.downloadSince = null;
     this.group_id = ""; 
-    this.accessToken = 'CAACEdEose0cBABBAvGs6SsS5ZArAETOzsn6Lw8ZAW2k1KFhDPgJWGHPX78QZBfGjf4lcvRmzp3ApQfoblZASaGJaiyhhHONZCMcwqVG2cKspdg7hOkmZC9YH8re0kPZBWiMn0E8UDFIFiYiLRzRtA28edZClVqZCGovbLzRYPFqtXKn0BlKFzWR36V1yZAZAHkY2S5WVPjLKwCkJAZDZD'; 
+    this.count = 0; 
+    this.accessToken = 'CAACEdEose0cBAKiTPsMpjHZCDvZAade8PoqHkd8NSpR5LV0eojv1jpNQE9shg0c9y9wzmnuSx3QOLZAFCpjZAGfiJpNXqYJk4Hb2bMZAcxz7zhKJ9utejepjWZB1I66VPeldw67VFmpp4iRZAMQgwXhtEBp4VmooDtKSZBw0KedAIJMnKSFGq2mw54lH0wV1iNXpXSjwqVkTjwZDZD'; 
     this.posts = [];
+    this.new_until = null; 
+    this.getGroupURL = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken; 
 }
+//CAACEdEose0cBAKiTPsMpjHZCDvZAade8PoqHkd8NSpR5LV0eojv1jpNQE9shg0c9y9wzmnuSx3QOLZAFCpjZAGfiJpNXqYJk4Hb2bMZAcxz7zhKJ9utejepjWZB1I66VPeldw67VFmpp4iRZAMQgwXhtEBp4VmooDtKSZBw0KedAIJMnKSFGq2mw54lH0wV1iNXpXSjwqVkTjwZDZD
 
 APIRequest.prototype = {
 
@@ -36,12 +40,11 @@ APIRequest.prototype = {
 
     // get the facebook group posts
     getGroups: function() {
-        var url = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken, 
+        var url = this.getGroupURL, 
             group_id = this.group_id, 
             self = this; 
 
         return request( url, function( error, response, body ) {
-
             // grab the body response
             groups = JSON.parse( body );
             // catch and scream about errors...
@@ -64,7 +67,8 @@ APIRequest.prototype = {
 
                     console.log( "---- ASYNCHRONOUS CALL ... #3 is actually called before #2 ----" ); 
                     console.log( "2. successfully got group id...moving on... \n" ); 
-                    self.getPostsForGroup(); 
+                    var getPostsURL = self.timeParamUrl(); 
+                    self.getPostsForGroup( getPostsURL ); 
                 }
             }
         })
@@ -74,21 +78,23 @@ APIRequest.prototype = {
         this.group_id = group_id; 
     }, 
 
-    getPostsForGroup: function() {
-        console.log( "3. passing group id \n", this.group_id, "\n" ); 
+    getPostsForGroup: function( url ) {
+        console.log( "\n 3. passing group id \n", this.group_id, "\n" ); 
 
-        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=1000&since=2013-07-02&access_token=" + this.accessToken + "& fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(1000)";
-        group_id = this.group_id, 
+        // retrieve all updated times from the post object & sort it
+        function sortedUpdated( posts ) {
+            return _.pluck( posts.data, 'updated_time' ).sort(); 
+        }
+
+        var group_id = this.group_id, 
+            accessToken = this.accessToken, 
+            new_until = this.new_until, 
+            _POSTS = this.res_data, 
+            count = this.count, 
+            numPostsFetched = "", 
             self = this; 
 
-        console.log( "4. requesting permission from facebook to get secret group posts" ); 
-
-        // TODO 
-        // we'll have to create a database or figure out a way to use the UNTIL & SINCE clauses in the get request
-        var new_url = this.timeParamUrl( null, null, url ); 
-        
         return request( url, function( error, response, body ) {
-
             // grab the body response
             posts = JSON.parse( body );
             // catch and scream about errors...
@@ -96,38 +102,61 @@ APIRequest.prototype = {
             if ( error ) {
                 console.log( "error ", error );
                 process.exit(); 
-            } else if ( indexOf.call( posts, "error" ) >= 0 ) {
-                console.log( "posts error ", posts.error );
+            } else if ( indexOf.call( groups, "error" ) >= 0 ) {
+                console.log( "posts error ", groups.error );
                 process.exit(); 
             }
 
-            console.log( "\n", posts.data.length, " posts " ); 
+            var numPostsFetched = posts.data.length;
+            
+            // now we have a list of groups
+            // find save mah inbox group
+            // save it's id so we can create an actual req to SMI posts
+            console.log( "\n5. looping through posts data \n" ); 
 
+            if ( numPostsFetched > 0 ) {
+
+                var newUntil = moment( _.first( sortedUpdated( posts ) ) ).unix() - 1, 
+                    newUntilDate = moment( _.first( sortedUpdated( posts ) ) ).format( "dddd, MMMM Do YYYY, h:mm:ss a" ), 
+                    newURL = self.timeParamUrl( undefined, newUntil ); 
+
+                console.log( ' \n ====== current posts fetch length [ ', numPostsFetched, ' ] ====== ' ); 
+                console.log( " \n getting posts from: [", 0 , "]   --> until : [", newUntilDate, "] "); 
+                console.log( ' \n hopefully a newer url with date [ ', newURL, ' ]' ); 
+
+                self.getPostsForGroup( newURL ); 
+            }
+            else { 
+                console.log( "finished grabbing all posts" ); 
+                process.exit() 
+            }; 
+            //            for ( var i in posts.data ) {
+            //
+            //            }
         })
-        
     }, 
-    
-    timeParamUrl: function( since, untilTime, url ) {
-        if ( since == null) {
-            since = null;
-        }
-        if ( untilTime == null ) {
-            untilTime = null;
-        }
-        
-        if ( untilTime == null ) {
-            url += "&until=" + ( moment().unix() );
-            untilTime = moment().unix();
-        } else {
-            url += "&until=" + untilTime;
-        }
-        if ( since != null ) {
-            url += "&since=" + since;
-        } else {
-            if ( this.downloadSince != null ) {
-                url += "&since=" + this.downloadSince;
-            } else {
-                url += "&since=0";
+
+    timeParamUrl: function( since, untilTime ) {
+
+        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=100&access_token=" + this.accessToken + "&fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(999)", 
+            untilDate = moment( untilTime ).format( "dddd, MMMM Do YYYY, h:mm:ss a" ); 
+
+        if ( untilTime === undefined ) {
+            untilTime = "&until=" + ( moment().unix() );
+            url += untilTime; 
+        } 
+        else { url += "&until=" + untilTime; }
+
+
+        if ( since !== undefined ) { url += "&since=" + since; } 
+        else {
+            if ( this.downloadSince !== null ) {
+                since = "&since=" + this.downloadSince;
+                url += since;
+            } 
+            else {
+                since = "&since=0"; 
+                url += since;
             }
         }
         return url;

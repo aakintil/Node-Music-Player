@@ -19,9 +19,7 @@ var indexOf = [].indexOf || function( item ) {
 
 
 // Removing all documents with the 'match-all' query
-appDB.remove( {}, { multi: true }, function ( err, numRemoved ) {
-    console.log( "successfully removed: ", numRemoved ); 
-});
+
 
 // weird persistent access token hack that doesn't work 
 // https://graph.facebook.com/oauth/access_token?client_id=766241740105535&client_secret=9a58c535db3b7e9c8bd26b2179d91a85&grant_type=fb_exchange_token&fb_exchange_token=CAACEdEose0cBAH7zWnDqWlRSkc3xcI9aUjLSobttOA1o3662qhEEYn5X1zaUuH2UDTOZBhHUMlbEh2WfRRh8p3NiiLH554CilHnnvxbkcNJlalqOZB3tI0rZAv8ZBWhl9FdrLdLUfy2FMZB6ULQv8pth2sYstMXsR0MNgFv8B7AwaO0Tk5U7YiubPHAm9nObkS0qOqwHPYgZDZD
@@ -32,10 +30,11 @@ function APIRequest() {
     this.group_id = ""; 
     this.groupIDs = []; 
     this.count = 0; 
-    this.accessToken = 'CAAK45I67Jz8BAHbG5dFFvGERKP5hjpZB3FH04UQ3p74ZCEUM6SDRWyBZBROLPhG89CpBZBdZAgAA98bBkjTXZApmeWVdQlqo6RzhdbS9mRkKiyT7JZCA34ZBL3EWSFixkAJ7IFliQHyEZAOwvnqspLibHIHkthIvcP1VfhkQvfJZB9xuxOruzBRY1R7cDvyhIqgvO2crdRWzJhZBQZDZD'; 
+    this.accessToken = 'CAACEdEose0cBAIIcf4yETn4MGwZCJiZA5e3ZBrlj7o43ZAclwUNrq8QA9TXWvC4xcxGsQjrD5ns8F1LwNkp9DGjZAScO3Q1WO5oplrv0aZAzht06m7K0JHjP26XN80nlFccplhBuZAQ0uPNWmKZABgIWAz2JeCbol27kkG0SZAETz0FJVDGNZBhvoujcCieaK2uA6CtKrj6FSQZAgZDZD'; 
     this.posts = [];
     this.new_until = null; 
     this.getGroupURL = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken; 
+    this.currentPostIndex = 0; 
 }
 
 // Main logic for all requests to put posts into a local db
@@ -85,9 +84,12 @@ APIRequest.prototype = {
             // save it's id so we can create an actual req to SMI posts
             console.log( "\n1. successful graph explorer api call \n" ); 
             for ( var i in groups.data ) {
+
+                // grabbing all necessary group ids for future reference
                 self.storeAllGroupIDs( groups.data[ i ].name, groups.data[ i ].id, i ); 
+
                 if ( groups.data[ i ].name === 'Save Mah Inbox' ) {
-                    self.saveGroupId( groups.data[ i ].id );
+                    self.saveCurrentGroupId( groups.data[ i ].id );
                     console.log( "---- ASYNCHRONOUS CALL ... #3 is actually called before #2 ----" ); 
                     console.log( "2. successfully got group id...moving on... \n" ); 
                     var getPostsURL = self.timeParamUrl(); 
@@ -99,7 +101,7 @@ APIRequest.prototype = {
 
     // save a specific group id
     // might delete we have a db / storage of all MY groups and their ids
-    saveGroupId: function( group_id ) {
+    saveCurrentGroupId: function( group_id ) {
         this.group_id = group_id; 
     }, 
 
@@ -118,6 +120,7 @@ APIRequest.prototype = {
             _POSTS = this.res_data, 
             count = this.count, 
             numPostsFetched = "", 
+            //            currentPostIndex = this.currentPostIndex,
             self = this; 
 
         return request( url, function( error, response, body ) {
@@ -133,6 +136,7 @@ APIRequest.prototype = {
                 process.exit(); 
             }
 
+            // number of posts fetched
             var numPostsFetched = posts.data.length;
 
             // now we have a list of groups
@@ -143,21 +147,26 @@ APIRequest.prototype = {
             if ( numPostsFetched > 0 ) {
 
                 // save items into db
-                appDB.insert( [ posts.data[ 0 ], posts.data[ 1 ] ], function( err, newPost ) {
-                    console.log( '\n newly inserted post ', newPost )
-                }); 
+                for ( var i = 0; i < posts.data.length; i++ ) {
+                    appDB.insert( posts.data[ i ], function( err, newPost ) {
+                        console.log( '\n newly inserted post ', newPost.id )
+                    });    
+                }
+                
                 var newUntil = moment( _.first( sortedUpdated( posts ) ) ).unix() - 1, 
                     newUntilDate = moment( _.first( sortedUpdated( posts ) ) ).format( "dddd, MMMM Do YYYY, h:mm:ss a" ), 
                     newURL = self.timeParamUrl( undefined, newUntil ); 
 
-                console.log( ' \n ====== current posts fetch length [ ', numPostsFetched, ' ] ====== ' ); 
+                // console.log( ' \n ====== current posts fetch length [ ', numPostsFetched, ' ] ====== ' ); 
                 console.log( " \n getting posts from: [", 0 , "]   --> until : [", newUntilDate, "] "); 
-                console.log( ' \n hopefully a newer url with date [ ', newURL, ' ]' ); 
+                // console.log( ' \n hopefully a newer url with date [ ', newURL, ' ]' ); 
 
+                currentPostIndex++; 
                 self.getPostsForGroup( newURL ); 
             }
             else { 
-                console.log( "finished grabbing all posts" ); 
+                console.log( "\nfinished grabbing all posts" ); 
+                //                console.log( "\n we have... ", appDB.find({}).length, "  posts ------- fin -------" );
                 process.exit() 
             }; 
             //            for ( var i in posts.data ) {
@@ -215,4 +224,38 @@ a = new APIRequest();
 //    console.log( posts );
 //})
 
-a.getGroups(); 
+if ( process.argv[ 2 ] === "empty" ) { 
+
+    console.log( "resetting db..." ); 
+    appDB.remove( {}, { multi: true }, function ( err, numRemoved ) {
+        console.log( "successfully removed: ", numRemoved ); 
+    });
+
+}
+
+if ( process.argv[ 2 ] === "download" ) { 
+    console.log( "in here"); 
+    a.getGroups();
+}
+
+if ( process.argv[ 2 ] === "count_all_posts" ) {
+    console.log( "\n we have..... \n" ); 
+    appDB.count( {}, function( err, count ) { 
+        if ( err ) 
+            console.log( "you don fucked up..."); 
+        else 
+            console.log( count ); 
+    }) 
+    console.log( " posts" ); 
+}
+
+if ( process.argv[ 2 ] === "get" ) {
+    appDB.find( { "from.name" : "Wale Desalu" }, function( err, res ) { 
+        if ( err ) 
+            console.log( "you don fucked up..."); 
+        else 
+            console.log( res[ 10 ].likes.data.length ); 
+    }) 
+}
+
+console.log( process.argv[ 2 ], process.argv[ 3 ], process.argv[ 4 ] )

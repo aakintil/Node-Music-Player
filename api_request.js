@@ -152,7 +152,7 @@ APIRequest.prototype = {
                         console.log( '\n newly inserted post ', newPost.id )
                     });    
                 }
-                
+
                 var newUntil = moment( _.first( sortedUpdated( posts ) ) ).unix() - 1, 
                     newUntilDate = moment( _.first( sortedUpdated( posts ) ) ).format( "dddd, MMMM Do YYYY, h:mm:ss a" ), 
                     newURL = self.timeParamUrl( undefined, newUntil ); 
@@ -166,13 +166,16 @@ APIRequest.prototype = {
             }
             else { 
                 console.log( "\nfinished grabbing all posts" ); 
-                //                console.log( "\n we have... ", appDB.find({}).length, "  posts ------- fin -------" );
                 process.exit() 
             }; 
-            //            for ( var i in posts.data ) {
-            //
-            //            }
-        })
+        }); 
+
+        console.log( "\nwe have... ", appDB.count( {}, function( err, count ) { 
+            if ( err ) 
+                console.log( "you don fucked up..."); 
+            else 
+                console.log( count ); 
+        }) , " posts ------- fin -------" );
     }, 
 
     // edit the url to append Until Specific Date clause
@@ -219,10 +222,11 @@ function getGroups( accessToken ) {
 
 a = new APIRequest(); 
 //a.getGroups(); 
+if ( process.argv[ 2 ]) {
 
-//appDB.find( {}, function( err, posts ) {
-//    console.log( posts );
-//})
+}
+
+
 
 if ( process.argv[ 2 ] === "empty" ) { 
 
@@ -233,9 +237,15 @@ if ( process.argv[ 2 ] === "empty" ) {
 
 }
 
-if ( process.argv[ 2 ] === "download" ) { 
+posts = "";
+if ( process.argv[ 2 ] === "init" ) { 
     console.log( "in here"); 
-    a.getGroups();
+    //    a.getGroups();
+    appDB.find( {}, function( err, els ) {
+        console.log( els.length )
+        posts = els;
+    })
+    console.log( "  posts ", posts.length ); 
 }
 
 if ( process.argv[ 2 ] === "count_all_posts" ) {
@@ -254,8 +264,8 @@ if ( process.argv[ 2 ] === "get" ) {
         if ( err ) 
             console.log( "you don fucked up..."); 
         else 
-            console.log( res[ 10 ].likes.data.length ); 
+            console.log( res[ 10 ].likes.data ); 
     }) 
 }
 
-console.log( process.argv[ 2 ], process.argv[ 3 ], process.argv[ 4 ] )
+console.log( " your process arguments are ", "| ", process.argv[ 2 ] , "  | ", process.argv[ 3 ], " | ", process.argv[ 4 ] )

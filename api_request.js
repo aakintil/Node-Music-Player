@@ -170,12 +170,12 @@ APIRequest.prototype = {
             }; 
         }); 
 
-        console.log( "\nwe have... ", appDB.count( {}, function( err, count ) { 
-            if ( err ) 
-                console.log( "you don fucked up..."); 
-            else 
-                console.log( count ); 
-        }) , " posts ------- fin -------" );
+//        console.log( "\nwe have... ", appDB.count( {}, function( err, count ) { 
+//            if ( err ) 
+//                console.log( "you don fucked up..."); 
+//            else 
+//                console.log( count ); 
+//        }) , " posts ------- fin -------" );
     }, 
 
     // edit the url to append Until Specific Date clause
@@ -218,54 +218,59 @@ function getGroups( accessToken ) {
 }
 
 
+console.log( 'END OF THERE')
 
-
-a = new APIRequest(); 
-//a.getGroups(); 
-if ( process.argv[ 2 ]) {
-
-}
-
-
-
-if ( process.argv[ 2 ] === "empty" ) { 
-
-    console.log( "resetting db..." ); 
-    appDB.remove( {}, { multi: true }, function ( err, numRemoved ) {
-        console.log( "successfully removed: ", numRemoved ); 
-    });
-
-}
-
-posts = "";
-if ( process.argv[ 2 ] === "init" ) { 
-    console.log( "in here"); 
-    //    a.getGroups();
-    appDB.find( {}, function( err, els ) {
-        console.log( els.length )
-        posts = els;
-    })
-    console.log( "  posts ", posts.length ); 
-}
-
-if ( process.argv[ 2 ] === "count_all_posts" ) {
-    console.log( "\n we have..... \n" ); 
-    appDB.count( {}, function( err, count ) { 
-        if ( err ) 
-            console.log( "you don fucked up..."); 
-        else 
-            console.log( count ); 
-    }) 
-    console.log( " posts" ); 
-}
-
-if ( process.argv[ 2 ] === "get" ) {
-    appDB.find( { "from.name" : "Wale Desalu" }, function( err, res ) { 
-        if ( err ) 
-            console.log( "you don fucked up..."); 
-        else 
-            console.log( res[ 10 ].likes.data ); 
-    }) 
-}
-
-console.log( " your process arguments are ", "| ", process.argv[ 2 ] , "  | ", process.argv[ 3 ], " | ", process.argv[ 4 ] )
+//a = new APIRequest(); 
+//var ALLOFTHEM = []; 
+//appDB.find( {}, function( err, els ) {
+//
+//    ALLOFTHEM = els;
+//})
+////a.getGroups(); 
+//if ( process.argv[ 2 ]) {
+//
+//}
+//
+//
+//
+//if ( process.argv[ 2 ] === "empty" ) { 
+//
+//    console.log( "resetting db..." ); 
+//    appDB.remove( {}, { multi: true }, function ( err, numRemoved ) {
+//        console.log( "successfully removed: ", numRemoved ); 
+//    });
+//
+//}
+//
+//posts = "";
+//if ( process.argv[ 2 ] === "init" ) { 
+//    console.log( "in here"); 
+//    //    a.getGroups();
+//    appDB.find( {}, function( err, els ) {
+//        console.log( els.length )
+//        posts = els;
+//    })
+//    console.log( "  posts ", posts.length ); 
+//}
+//
+//if ( process.argv[ 2 ] === "count_all_posts" ) {
+//    console.log( "\n we have..... \n" ); 
+//    appDB.count( {}, function( err, count ) { 
+//        if ( err ) 
+//            console.log( "you don fucked up..."); 
+//        else 
+//            console.log( count ); 
+//    }) 
+//    console.log( " posts" ); 
+//}
+//
+//if ( process.argv[ 2 ] === "get" ) {
+//    appDB.find( { "from.name" : "Wale Desalu" }, function( err, res ) { 
+//        if ( err ) 
+//            console.log( "you don fucked up..."); 
+//        else 
+//            console.log( res[ 10 ].likes.data ); 
+//    }) 
+//}
+//
+//console.log( " your process arguments are ", "| ", process.argv[ 2 ] , "  | ", process.argv[ 3 ], " | ", process.argv[ 4 ] )

@@ -1,89 +1,40 @@
-////var http = require( 'http' ), 
-////    fs = require( 'fs' ), 
-////    index = fs.readFileSync( 'index.html' ); 
-////
-////http.createServer( function ( req, res ) {
-////    res.writeHead( 200, {'Content-Type': 'text/plain'} );
-////    res.end( index );
-////}).listen( 8080, 'localhost' );
-////console.log( 'Server running at http://localhost:8080/' );
-//
-//var express = require('express'), 
-//    path = require('path'), 
-//    _ = require('underscore'), 
-//    request = require('request'), 
-//    app = express(); 
-//
-//var indexOf = [].indexOf || function( item ) { 
-//    for ( var i = 0, l = this.length; i < l; i++ ) { 
-//        if ( i in this && this[ i ] === item ) 
-//            return i; 
-//    } return -1; 
-//};
-//
-//// viewed at http://localhost:8080
-//app.get( '/', function( req, res ) {
-//    res.sendFile( path.join( __dirname + '/index.html' ) );
-//});
-//
-//// listening / showing index
-//console.log( "node server running...listening on port 8080")
-//app.listen( 8080 );
+var express = require('express'), 
+    app = express(), 
+    path = require('path'), 
+    Datastore = require( 'nedb' ), 
+    appDB = new Datastore( { filename: 'db/app.db.js', autoload: true } ); 
+
+// apparently this is needed to serve up local files
+app.use(express.static(__dirname + '/public/js'));
+
+// you can use these as well 
+//app.use('/img',express.static(path.join(__dirname, 'public/images')));
+//app.use('/js',express.static(path.join(__dirname, 'public/javascripts')));
+//app.use('/css',express.static(path.join(__dirname, 'public/stylesheets')));
+
+app.get('/getAllPosts', function(req, res) {
+    appDB.find( {}, function( err, els ) {
+        //        console.log( els.length )
+        posts = els;
+        res.json({ db: els });
+    })
+});
+
+app.get('server.js', function(req, res) {
+
+console.log( "query got called! " );     
+    
+//    appDB.find( {}, function( err, els ) {
+//        //        console.log( els.length )
+//        posts = els;
+//        res.json({ db: els });
+//    })
+});
 
 
-var http = require('http');
-var fs = require('fs');
-var path = require('path');
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname + '/index.html'));
+});
 
-http.createServer(function (request, response) {
-    console.log('request starting...');
-
-    var filePath = '.' + request.url;
-    if (filePath == './')
-        filePath = './index.html';
-
-    var extname = path.extname(filePath);
-    var contentType = 'text/html';
-    switch (extname) {
-        case '.js':
-            contentType = 'text/javascript';
-            break;
-        case '.css':
-            contentType = 'text/css';
-            break;
-        case '.json':
-            contentType = 'application/json';
-            break;
-        case '.png':
-            contentType = 'image/png';
-            break;      
-        case '.jpg':
-            contentType = 'image/jpg';
-            break;
-        case '.wav':
-            contentType = 'audio/wav';
-            break;
-    }
-
-    fs.readFile(filePath, function(error, content) {
-        if (error) {
-            if(error.code == 'ENOENT'){
-                fs.readFile('./404.html', function(error, content) {
-                    response.writeHead(200, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
-                });
-            }
-            else {
-                response.writeHead(500);
-                response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
-                response.end(); 
-            }
-        }
-        else {
-            response.writeHead(200, { 'Content-Type': contentType });
-            response.end(content, 'utf-8');
-        }
-    });
-
-}).listen(8125);
-console.log('Server running at http://127.0.0.1:8125/');
+app.listen(8080);
+console.log( "starting on port 8080..."); 

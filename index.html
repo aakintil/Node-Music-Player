@@ -1,14 +1,32 @@
 <!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title> Node Music Player </title>
-    <script src="bundle.js"></script>
-</head>
-<body>
-<h1> Hello World </h1>
+    <head>
+        <meta charset="UTF-8">
+        <title> Node Music Player </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> 
+        <script src="main.js"></script>
+    </head>
+    <body>
+        <style>
+            main {
+                height: 100px; 
+            }
+            main > div {
+                border: 1px solid red; 
+                padding: 50px; 
+                color: red;
+            }
+        </style>
 
+        <section>
+            <input id="trigger" type="text">
+            <button>search</button>
+        </section>
+        
+        <main>
 
-</body>
+        </main>
+    </body>
 </html>
 

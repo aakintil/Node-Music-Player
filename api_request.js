@@ -170,12 +170,12 @@ APIRequest.prototype = {
             }; 
         }); 
 
-//        console.log( "\nwe have... ", appDB.count( {}, function( err, count ) { 
-//            if ( err ) 
-//                console.log( "you don fucked up..."); 
-//            else 
-//                console.log( count ); 
-//        }) , " posts ------- fin -------" );
+        //        console.log( "\nwe have... ", appDB.count( {}, function( err, count ) { 
+        //            if ( err ) 
+        //                console.log( "you don fucked up..."); 
+        //            else 
+        //                console.log( count ); 
+        //        }) , " posts ------- fin -------" );
     }, 
 
     // edit the url to append Until Specific Date clause

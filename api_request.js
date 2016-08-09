@@ -3,6 +3,7 @@ var express = require( 'express' ),
     Datastore = require( 'nedb' ), 
     _ = require( 'underscore' ), 
     moment = require( 'moment' ),
+    fs = require('fs'),
     request = require( 'request' ), 
     app = express(); 
 
@@ -12,7 +13,7 @@ var indexOf = [].indexOf || function( item ) {
             return i; 
     } return -1; 
 }, 
-    appDB = new Datastore( { filename: 'db/app.db.js', autoload: true } ), 
+    appDB = new Datastore( { filename: 'db/app.db.json', autoload: true } ), 
     _SMI = new Datastore( { filename: 'db/save.my.inbox.js', autoload: false } ), 
     _FUNC = new Datastore( { filename: 'db/function.js', autoload: false } ), 
     _SUPR = new Datastore( { filename: 'db/superior.js', autoload: false } ); 
@@ -26,11 +27,12 @@ var indexOf = [].indexOf || function( item ) {
 
 function APIRequest() {
     this.res_data = []; 
+    this.exportDatabase = []; 
     this.downloadSince = null;
     this.group_id = ""; 
     this.groupIDs = []; 
     this.count = 0; 
-    this.accessToken = 'EAACEdEose0cBANKuQyV6sJ9TWeFR8LFktDmytqFjNK62mXG1uow89ZAgCB68lqHfbmRc386Hod7nel4ClHVKek1LWUJTQYPQeDjp6NZCJlKLw9TyRJZAHAwH8jSxQ3hUKZC9PZCedC1ueZC0eCVZBz1mYGxZBLMjIXjbZCT8lEaojGgZDZD'; 
+    this.accessToken = 'EAACEdEose0cBAAPgUQvvc73G7zoArgjbQmOVK7verGsQxw65K1l2MXuZCWyvAX1euW5exvzlkDxBVco2s3ORmSfX9mWplMalY956rZBA98qjNXwpyEtlI3ZB81WlCuTDXskiBqczLjdOtwDGvmJuZBk0evcKM2cwSiHIj6Qv8QZDZD'; 
     this.posts = [];
     this.new_until = null; 
     this.getGroupURL = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken; 
@@ -149,9 +151,12 @@ APIRequest.prototype = {
 
                 // save items into db
                 for ( var i = 0; i < posts.data.length; i++ ) {
-                    appDB.insert( posts.data[ i ], function( err, newPost ) {
-                        console.log( '\n newly inserted post ', newPost.id )
-                    });    
+
+                    self.exportDatabase.push( posts.data[ i ] ); 
+                    console.log( '\n newly inserted post ', posts.data[ i ].id )
+                    // appDB.insert( posts.data[ i ], function( err, newPost ) {
+                    //     console.log( '\n newly inserted post ', newPost.id )
+                    // });    
                 }
 
                 var newUntil = moment( _.first( sortedUpdated( posts ) ) ).unix() - 1, 
@@ -166,8 +171,17 @@ APIRequest.prototype = {
                 self.getPostsForGroup( newURL ); 
             }
             else { 
-                console.log( "\nfinished grabbing all posts" ); 
-                process.exit() 
+                console.log( "\nfinished grabbing all posts" );  
+                console.log( "\n....about to export to a file" ); 
+
+                fs.writeFile( 'db/test.js', JSON.stringify( self.exportDatabase ), function ( err ) {
+                    if ( err ) {
+                        console.error('YOU FUCKED UP');
+                    } else {
+                        console.log("Output saved to /test.js");
+                        process.exit() 
+                    }
+                });
             }; 
         }); 
 
@@ -205,6 +219,21 @@ APIRequest.prototype = {
             }
         }
         return url;
+    }, 
+
+    // export db
+    exportDB: function( array ) {
+
+        console.log( array.length ); 
+        require('fs').writeFile(
+            'db/test.json',
+            JSON.stringify( array ),
+            function ( err ) {
+                if (err) {
+                    console.error('Crap happens');
+                }
+            }
+        );
     }
 }
 
@@ -219,14 +248,13 @@ function getGroups( accessToken ) {
 }
 
 
-console.log( 'END OF THERE')
-
 a = new APIRequest(); 
 //var ALLOFTHEM = []; 
 //appDB.find( {}, function( err, els ) {
 //
 //    ALLOFTHEM = els;
 //})
+
 a.getGroups(); 
 //if ( process.argv[ 2 ]) {
 //

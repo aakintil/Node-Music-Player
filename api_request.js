@@ -30,7 +30,7 @@ function APIRequest() {
     this.group_id = ""; 
     this.groupIDs = []; 
     this.count = 0; 
-    this.accessToken = 'CAACEdEose0cBAIIcf4yETn4MGwZCJiZA5e3ZBrlj7o43ZAclwUNrq8QA9TXWvC4xcxGsQjrD5ns8F1LwNkp9DGjZAScO3Q1WO5oplrv0aZAzht06m7K0JHjP26XN80nlFccplhBuZAQ0uPNWmKZABgIWAz2JeCbol27kkG0SZAETz0FJVDGNZBhvoujcCieaK2uA6CtKrj6FSQZAgZDZD'; 
+    this.accessToken = 'EAACEdEose0cBANKuQyV6sJ9TWeFR8LFktDmytqFjNK62mXG1uow89ZAgCB68lqHfbmRc386Hod7nel4ClHVKek1LWUJTQYPQeDjp6NZCJlKLw9TyRJZAHAwH8jSxQ3hUKZC9PZCedC1ueZC0eCVZBz1mYGxZBLMjIXjbZCT8lEaojGgZDZD'; 
     this.posts = [];
     this.new_until = null; 
     this.getGroupURL = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken; 
@@ -119,6 +119,7 @@ APIRequest.prototype = {
             new_until = this.new_until, 
             _POSTS = this.res_data, 
             count = this.count, 
+            currentPostIndex = 0,
             numPostsFetched = "", 
             //            currentPostIndex = this.currentPostIndex,
             self = this; 
@@ -220,13 +221,13 @@ function getGroups( accessToken ) {
 
 console.log( 'END OF THERE')
 
-//a = new APIRequest(); 
+a = new APIRequest(); 
 //var ALLOFTHEM = []; 
 //appDB.find( {}, function( err, els ) {
 //
 //    ALLOFTHEM = els;
 //})
-////a.getGroups(); 
+a.getGroups(); 
 //if ( process.argv[ 2 ]) {
 //
 //}
@@ -243,14 +244,13 @@ console.log( 'END OF THERE')
 //}
 //
 //posts = "";
-//if ( process.argv[ 2 ] === "init" ) { 
-//    console.log( "in here"); 
-//    //    a.getGroups();
-//    appDB.find( {}, function( err, els ) {
-//        console.log( els.length )
-//        posts = els;
-//    })
-//    console.log( "  posts ", posts.length ); 
+////if ( process.argv[ 2 ] === "init" ) { 
+////    console.log( "in here"); 
+////    //    a.getGroups();
+//appDB.find( {}, function( err, els ) {
+//    posts = els;
+//}); 
+
 //}
 //
 //if ( process.argv[ 2 ] === "count_all_posts" ) {

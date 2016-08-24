@@ -32,7 +32,7 @@ function APIRequest() {
     this.group_id = ""; 
     this.groupIDs = []; 
     this.count = 0; 
-    this.accessToken = 'EAACEdEose0cBAAPgUQvvc73G7zoArgjbQmOVK7verGsQxw65K1l2MXuZCWyvAX1euW5exvzlkDxBVco2s3ORmSfX9mWplMalY956rZBA98qjNXwpyEtlI3ZB81WlCuTDXskiBqczLjdOtwDGvmJuZBk0evcKM2cwSiHIj6Qv8QZDZD'; 
+    this.accessToken = 'EAACEdEose0cBACwYFJJpNTWkNuh4TZAg5XR3TQ1h1XKezlr1vwxf0hBVLU7Viaq78u9jg8ZBS3g8G85RlZBjB9SswFCTuzqtICCA41ceM6kRjBKorSl1zRgXWqVQfGMY19wCa0DuxJcSYL7RlBIazMUVvt1hEsoj6RwbbJkOwZDZD'; 
     this.posts = [];
     this.new_until = null; 
     this.getGroupURL = "https://graph.facebook.com/me/groups?access_token=" + this.accessToken; 
@@ -197,7 +197,7 @@ APIRequest.prototype = {
     // so that we can loop through facebook until there are no more posts in the group
     timeParamUrl: function( since, untilTime ) {
 
-        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=100&access_token=" + this.accessToken + "&fields=from,to,message,picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(999)", 
+        var url = "https://graph.facebook.com/" + this.group_id + "/feed?limit=100&access_token=" + this.accessToken + "&fields=from,to,message,full_picture,link,name,caption,description,created_time,updated_time,likes,comments.limit(999)", 
             untilDate = moment( untilTime ).format( "dddd, MMMM Do YYYY, h:mm:ss a" ); 
 
         if ( untilTime === undefined ) {
